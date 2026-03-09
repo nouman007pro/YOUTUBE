@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>YouTube Downloader</title>
+
+<style>
+body { font-family: Arial; background:#f4f4f4; text-align:center; padding:40px; }
+.container { background:white; padding:30px; border-radius:10px; max-width:700px; margin:auto; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+input { width:80%; padding:10px; font-size:16px; }
+button { padding:8px 12px; margin:5px; font-size:14px; cursor:pointer; border:none; border-radius:5px; background:red; color:white; }
+button:hover { background:#cc0000; }
+img, iframe { border-radius:8px; }
+.error { color:red; font-weight:bold; }
+.format-button { background:#007bff; color:white; }
+.format-button:hover { background:#0056b3; }
+.audio { background:#28a745; }
+.audio:hover { background:#1e7e34; }
+.video { background:#17a2b8; }
+.video:hover { background:#117a8b; }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2>YouTube Video Downloader</h2>
+
+<form method="post">
+<input type="text" name="url" placeholder="Paste YouTube URL here" required><br><br>
+<button type="submit">Get Video</button>
+</form>
+
+{% if error %}
+<p class="error">Error: {{ error }}</p>
+{% endif %}
+
+{% if title %}
+<hr>
+<h3>{{ title }}</h3>
+
+<!-- Video Embed -->
+{% if url %}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/{{ url.split('v=')[-1] }}" frameborder="0" allowfullscreen></iframe><br><br>
+{% endif %}
+
+<!-- Thumbnail -->
+{% if thumbnail %}
+<img src="{{ thumbnail }}" width="350"><br><br>
+{% endif %}
+
+<h4>Available Formats:</h4>
+
+<!-- Loop through formats -->
+{% for f in formats %}
+    {% if f.vcodec != 'none' and f.acodec != 'none' %}
+        <!-- Video+Audio -->
+        <a href="/download?url={{ url }}&format={{ f.format_id }}">
+            <button class="format-button video">{{ f.ext }} | {{ f.resolution }}</button>
+        </a>
+    {% elif f.vcodec == 'none' and f.acodec != 'none' %}
+        <!-- Audio only -->
+        <a href="/download?url={{ url }}&format={{ f.format_id }}">
+            <button class="format-button audio">{{ f.ext }} | Audio</button>
+        </a>
+    {% endif %}
+{% endfor %}
+
+{% endif %}
+
+</div>
+
+</body>
+</html>
